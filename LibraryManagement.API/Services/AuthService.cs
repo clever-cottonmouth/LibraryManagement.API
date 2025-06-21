@@ -12,6 +12,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Konscious.Security.Cryptography;
+using System.Security.Cryptography;
+
 
 namespace LibraryManagement.API.Services
 {
@@ -99,14 +102,81 @@ namespace LibraryManagement.API.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        //private string HashPassword(string password)
+        //{
+        //    return BCrypt.Net.BCrypt.HashPassword(password);
+        //}
+
+        //private bool VerifyPassword(string password, string hash)
+        //{
+        //    return BCrypt.Net.BCrypt.Verify(password, hash);
+        //}
+
         private string HashPassword(string password)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password);
+            // Convert password to bytes
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+            // Configure Argon2 (Argon2id is recommended for password hashing)
+            using var hasher = new Argon2id(passwordBytes)
+            {
+                DegreeOfParallelism = 4, // Number of threads
+                MemorySize = 65536,      // 64 MB memory
+                Iterations = 4           // Number of iterations
+            };
+
+            // Generate a random salt (16 bytes recommended)
+            byte[] salt = RandomNumberGenerator.GetBytes(16);
+            hasher.Salt = salt;
+
+            // Compute the hash
+            byte[] hash = hasher.GetBytes(32); // 32-byte hash
+
+            // Combine salt and hash for storage (base64 for simplicity)
+            byte[] hashBytes = new byte[salt.Length + hash.Length];
+            Buffer.BlockCopy(salt, 0, hashBytes, 0, salt.Length);
+            Buffer.BlockCopy(hash, 0, hashBytes, salt.Length, hash.Length);
+
+            return Convert.ToBase64String(hashBytes);
         }
 
-        private bool VerifyPassword(string password, string hash)
+        private bool VerifyPassword(string password, string storedHash)
         {
-            return BCrypt.Net.BCrypt.Verify(password, hash);
+            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(storedHash))
+                return false;
+
+            try
+            {
+                // Decode stored hash (salt + hash)
+                byte[] hashBytes = Convert.FromBase64String(storedHash);
+                if (hashBytes.Length < 48) // 16-byte salt + 32-byte hash
+                    return false;
+
+                // Extract salt and hash
+                byte[] salt = new byte[16];
+                byte[] storedHashBytes = new byte[32];
+                Buffer.BlockCopy(hashBytes, 0, salt, 0, 16);
+                Buffer.BlockCopy(hashBytes, 16, storedHashBytes, 0, 32);
+
+                // Compute hash of provided password
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+                using var hasher = new Argon2id(passwordBytes)
+                {
+                    DegreeOfParallelism = 4,
+                    MemorySize = 65536,
+                    Iterations = 4,
+                    Salt = salt
+                };
+
+                byte[] computedHash = hasher.GetBytes(32);
+
+                // Compare hashes (constant-time comparison)
+                return CryptographicOperations.FixedTimeEquals(computedHash, storedHashBytes);
+            }
+            catch
+            {
+                return false; // Invalid base64 or other errors
+            }
         }
 
         private async Task<bool> ValidateCaptcha(string token)
@@ -117,13 +187,13 @@ namespace LibraryManagement.API.Services
 
         public async Task<string> StudentLogin(LoginDto loginDto)
         {
-            var librarian = await _context.Librarians
+            var student = await _context.Students
                 .FirstOrDefaultAsync(l => l.Email == loginDto.Email);
 
-            if (librarian == null || !VerifyPassword(loginDto.Password, librarian.PasswordHash))
-                throw new UnauthorizedAccessException("Invalid credentials");
+            if (student == null || !VerifyPassword(loginDto.Password, student.PasswordHash))
+                return null;
 
-            return GenerateJwtToken(librarian.Email, "Librarian");
+            return GenerateJwtToken(student.Email, "Student");
         }
     }
 }
