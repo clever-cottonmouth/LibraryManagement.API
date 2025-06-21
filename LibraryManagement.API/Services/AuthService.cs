@@ -33,7 +33,7 @@ namespace LibraryManagement.API.Services
             var librarian = await _context.Librarians
                 .FirstOrDefaultAsync(l => l.Email == loginDto.Email);
 
-            if (librarian == null || !VerifyPassword(loginDto.Password, librarian.PasswordHash))
+            if (librarian == null || loginDto.Password != librarian.PasswordHash)
                 throw new UnauthorizedAccessException("Invalid credentials");
 
             return GenerateJwtToken(librarian.Email, "Librarian");
