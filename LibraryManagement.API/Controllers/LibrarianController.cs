@@ -133,6 +133,15 @@ namespace LibraryManagement.API.Controllers
             return Ok(students);
         }
 
-
-    }
+        [HttpGet("books/list")]
+        public async Task<IActionResult> GetBooks()
+        {
+            var books = await _libraryService.BooksList();
+            return Ok(new
+            {
+                Success = true,
+                Data = books
+            });
+        }
+        }
 }

@@ -51,7 +51,7 @@ namespace LibraryManagement.API.Services
                 Stock = bookDto.Stock,
                 IsActive = true,
                 PdfUrl = bookDto.PdfUrl,
-                
+
             };
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
@@ -126,7 +126,7 @@ namespace LibraryManagement.API.Services
                     Publication = b.Publication,
                     Stock = b.Stock,
                     PdfUrl = b.PdfUrl,
-                    
+
                 })
                 .ToListAsync();
         }
@@ -137,7 +137,7 @@ namespace LibraryManagement.API.Services
                 .Where(s => s.Name.Contains(query) || s.Email.Contains(query))
                 .Select(s => new StudentDto
                 {
-            
+
                     Email = s.Email,
                     Name = s.Name,
                     IsActive = s.IsActive,
@@ -166,12 +166,27 @@ namespace LibraryManagement.API.Services
         {
             return await _context.Students
                  .Select(s => new StudentDto
+                 {
+                     Id = s.Id,
+                     Email = s.Email,
+                     Name = s.Name,
+                     IsActive = s.IsActive,
+                     IsVerified = s.IsVerified
+                 })
+                .ToListAsync();
+        }
+
+        public async Task<List<BookDto>> BooksList()
+        {
+            return await _context.Books
+                .Select(b => new BookDto
                 {
-                    Id = s.Id,
-                    Email = s.Email,
-                    Name = s.Name,
-                    IsActive = s.IsActive,
-                    IsVerified = s.IsVerified
+                    Id = b.Id,
+                    Title = b.Title,
+                    Author = b.Author,
+                    Publication = b.Publication,
+                    Stock = b.Stock,
+                    PdfUrl = b.PdfUrl
                 })
                 .ToListAsync();
         }
