@@ -34,8 +34,24 @@ namespace LibraryManagement.API.Controllers
         [HttpPost("students")]
         public async Task<IActionResult> AddStudent([FromBody] StudentDto studentDto)
         {
-            await _libraryService.AddStudent(studentDto);
-            return Ok("Student added");
+            try
+            {
+                await _libraryService.AddStudent(studentDto);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Student added successfully",
+                    Data = studentDto
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    Success = false,
+                    Message = $"Failed to add student: {ex.Message}"
+                });
+            }
         }
 
         [HttpPut("students/{id}/deactivate")]
