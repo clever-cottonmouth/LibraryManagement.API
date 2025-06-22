@@ -55,6 +55,14 @@ namespace LibraryManagement.API.Controllers
             return Ok(books);
         }
 
+        [HttpGet("books/list")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> GetBooks()
+        {
+            var books = await _libraryService.BooksList();
+            return Ok(books);
+        }
+
         //[HttpGet("issued-books")]
         //[Authorize(Roles = "Student")]
         //public async Task<IActionResult> GetIssuedBooks()
