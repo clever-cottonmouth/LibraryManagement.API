@@ -14,6 +14,6 @@ namespace LibraryManagement.API.DTOs
         public string Publication { get; set; }
         public int Stock { get; set; }
         public string PdfUrl { get; set; }
-        public string WordUrl { get; set; }
+        
     }
 }

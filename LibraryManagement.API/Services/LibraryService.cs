@@ -51,7 +51,7 @@ namespace LibraryManagement.API.Services
                 Stock = bookDto.Stock,
                 IsActive = true,
                 PdfUrl = bookDto.PdfUrl,
-                WordUrl = bookDto.WordUrl
+                
             };
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
@@ -126,7 +126,7 @@ namespace LibraryManagement.API.Services
                     Publication = b.Publication,
                     Stock = b.Stock,
                     PdfUrl = b.PdfUrl,
-                    WordUrl = b.WordUrl
+                    
                 })
                 .ToListAsync();
         }

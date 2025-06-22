@@ -65,7 +65,12 @@ namespace LibraryManagement.API.Controllers
         public async Task<IActionResult> AddBook([FromBody] BookDto bookDto)
         {
             await _libraryService.AddBook(bookDto);
-            return Ok("Book added");
+            return Ok(new
+            {
+                Success = true,
+                Message = "Book added successfully",
+                Data = bookDto
+            });
         }
 
         [HttpPost("issue")]

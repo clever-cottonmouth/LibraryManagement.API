@@ -15,6 +15,5 @@ namespace LibraryManagement.API.Models
         public int Stock { get; set; }
         public bool IsActive { get; set; }
         public string PdfUrl { get; set; }
-        public string WordUrl { get; set; }
     }
 }
