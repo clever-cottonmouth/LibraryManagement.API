@@ -137,7 +137,7 @@ namespace LibraryManagement.API.Services
                 .Where(s => s.Name.Contains(query) || s.Email.Contains(query))
                 .Select(s => new StudentDto
                 {
-                    Id = s.Id,
+            
                     Email = s.Email,
                     Name = s.Name,
                     IsActive = s.IsActive,
