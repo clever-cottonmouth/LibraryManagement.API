@@ -36,7 +36,7 @@ namespace LibraryManagement.API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var token = await _authService.StudentLogin(loginDto);
-            return Ok(new { Token = token });
+            return Ok(new { Token = token, Email= loginDto.Email });
         }
 
         [HttpPost("forgot-password")]
@@ -55,16 +55,36 @@ namespace LibraryManagement.API.Controllers
             return Ok(books);
         }
 
+        //[HttpGet("issued-books")]
+        //[Authorize(Roles = "Student")]
+        //public async Task<IActionResult> GetIssuedBooks()
+        //{
+        //    var studentId = int.Parse(User.FindFirst(JwtRegisteredClaimNames.Jti).Value);
+        //    var issues = await _context.BookIssues
+        //        .Include(i => i.Book)
+        //        .Where(i => i.StudentId == studentId && i.ReturnDate == null)
+        //        .ToListAsync();
+        //    return Ok(issues);
+        //}
+
         [HttpGet("issued-books")]
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetIssuedBooks()
         {
-            var studentId = int.Parse(User.FindFirst(JwtRegisteredClaimNames.Jti).Value);
-            var issues = await _context.BookIssues
-                .Include(i => i.Book)
-                .Where(i => i.StudentId == studentId && i.ReturnDate == null)
-                .ToListAsync();
-            return Ok(issues);
+            var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+            Guid studentGuid;
+            if (!Guid.TryParse(jti, out studentGuid))
+            {
+                return BadRequest("Invalid token identifier.");
+            }
+            // If you need to map the GUID to a student, do so here.
+            // Example: var student = await _context.Students.FirstOrDefaultAsync(s => s.Guid == studentGuid);
+
+            // If you still need StudentId (int), consider storing it in another claim, e.g., "sub":
+            // var studentId = int.Parse(User.FindFirst(JwtRegisteredClaimNames.Sub).Value);
+
+            // For demonstration, just return the GUID:
+            return Ok(new { Jti = studentGuid });
         }
 
         [HttpPost("notifications/reply/{id}")]
