@@ -104,5 +104,14 @@ namespace LibraryManagement.API.Controllers
             await _libraryService.UpdateSettings(settings.MaxBookLimit, settings.PenaltyPerDay);
             return Ok("Settings updated");
         }
+
+        [HttpGet("students/list")]
+        public async Task<IActionResult> GetStudents()
+        {
+            var students = await _libraryService.StudentsList();
+            return Ok(students);
+        }
+
+
     }
 }

@@ -161,5 +161,19 @@ namespace LibraryManagement.API.Services
             }
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<StudentDto>> StudentsList()
+        {
+            return await _context.Students
+                 .Select(s => new StudentDto
+                {
+                    Id = s.Id,
+                    Email = s.Email,
+                    Name = s.Name,
+                    IsActive = s.IsActive,
+                    IsVerified = s.IsVerified
+                })
+                .ToListAsync();
+        }
     }
 }
