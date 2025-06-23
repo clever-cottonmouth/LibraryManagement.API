@@ -9,5 +9,6 @@ namespace LibraryManagement.API.DTOs
         public string Publication { get; set; }
         public int Stock { get; set; }
         public IFormFile PdfFile { get; set; }
+        
     }
 } 

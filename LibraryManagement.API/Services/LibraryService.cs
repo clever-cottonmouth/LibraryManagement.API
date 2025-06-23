@@ -282,5 +282,75 @@ namespace LibraryManagement.API.Services
                 IsActive = book.IsActive
             };
         }
+
+
+        public async Task<BookDto> GetBookById(int id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
+            {
+                throw new Exception("Book not found");
+            }
+
+            return new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                Publication = book.Publication,
+                Stock = book.Stock,
+                IsActive = book.IsActive,
+                PdfUrl = book.PdfUrl
+            };
+        }
+
+
+        public async Task UpdateBook(int id, BookDto bookDto, IFormFile pdfFile)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
+            {
+                throw new Exception("Book not found");
+            }
+
+            // Update book fields
+            book.Title = bookDto.Title;
+            book.Author = bookDto.Author;
+            book.Publication = bookDto.Publication;
+            book.Stock = bookDto.Stock;
+            book.IsActive = bookDto.IsActive;
+
+            // Handle PDF file update
+            if (pdfFile != null && pdfFile.Length > 0)
+            {
+                // Delete old PDF if it exists
+                if (!string.IsNullOrEmpty(book.PdfUrl))
+                {
+                    var oldFilePath = Path.Combine("wwwroot", book.PdfUrl.Replace("/", "\\"));
+                    if (File.Exists(oldFilePath))
+                    {
+                        File.Delete(oldFilePath);
+                    }
+                }
+
+                // Save new PDF
+                var uploadsFolder = Path.Combine("wwwroot", "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(pdfFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await pdfFile.CopyToAsync(stream);
+                }
+                book.PdfUrl = Path.Combine("uploads", fileName).Replace("\\", "/");
+            }
+
+            _context.Books.Update(book);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -271,5 +271,60 @@ namespace LibraryManagement.API.Controllers
                 });
             }
         }
+
+        [HttpGet("books/{id}")]
+        public async Task<IActionResult> GetBook(int id)
+        {
+            try
+            {
+                var book = await _libraryService.GetBookById(id);
+                return Ok(new
+                {
+                    Success = true,
+                    Data = book
+                });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+
+        [HttpPut("books/{id}")]
+        public async Task<IActionResult> UpdateBook(int id, [FromForm] AddBookFormDto form)
+        {
+            try
+            {
+                var bookDto = new BookDto
+                {
+                    Id = id,
+                    Title = form.Title,
+                    Author = form.Author,
+                    Publication = form.Publication,
+                    Stock = form.Stock,
+                    IsActive= true
+                };
+                await _libraryService.UpdateBook(id, bookDto, form.PdfFile);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Book updated successfully",
+                    Data = bookDto
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
     }
 }
