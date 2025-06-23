@@ -118,7 +118,10 @@ namespace LibraryManagement.API.Services
         public async Task<List<BookDto>> SearchBooks(string query)
         {
             return await _context.Books
-                .Where(b => b.Title.Contains(query) || b.Author.Contains(query) || b.Publication.Contains(query))
+                .Where(b => string.IsNullOrEmpty(query) ||
+                b.Title.Contains(query) 
+                || b.Author.Contains(query) 
+                || b.Publication.Contains(query))
                 .Select(b => new BookDto
                 {
                     Id = b.Id,
@@ -127,6 +130,7 @@ namespace LibraryManagement.API.Services
                     Publication = b.Publication,
                     Stock = b.Stock,
                     PdfUrl = b.PdfUrl,
+                    IsActive = b.IsActive
 
                 })
                 .ToListAsync();

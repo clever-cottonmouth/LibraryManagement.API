@@ -95,7 +95,7 @@ namespace LibraryManagement.API.Controllers
         }
 
         [HttpGet("books/search")]
-        public async Task<IActionResult> SearchBooks([FromQuery] string query)
+        public async Task<IActionResult> SearchBooks([FromQuery] string query="")
         {
             var books = await _libraryService.SearchBooks(query);
             return Ok(books);
