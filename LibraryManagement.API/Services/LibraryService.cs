@@ -53,7 +53,6 @@ namespace LibraryManagement.API.Services
                 Stock = bookDto.Stock,
                 IsActive = true,
                 PdfUrl = bookDto.PdfUrl,
-
             };
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
@@ -190,7 +189,8 @@ namespace LibraryManagement.API.Services
                     Author = b.Author,
                     Publication = b.Publication,
                     Stock = b.Stock,
-                    PdfUrl = b.PdfUrl
+                    PdfUrl = b.PdfUrl,
+                    IsActive = b.IsActive
                 })
                 .ToListAsync();
         }
@@ -222,6 +222,59 @@ namespace LibraryManagement.API.Services
                 Name = student.Name,
                 IsActive = student.IsActive,
                 IsVerified = student.IsVerified
+            };
+        }
+
+        public async Task<BookDto> DeleteBook(int id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null) return null;
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+            return new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                Publication = book.Publication,
+                Stock = book.Stock,
+                PdfUrl = book.PdfUrl
+            };
+        }
+
+        public async Task<BookDto> DeactivateBook(int id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null) return null;
+            book.IsActive = false;
+            await _context.SaveChangesAsync();
+            return new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                Publication = book.Publication,
+                Stock = book.Stock,
+                PdfUrl = book.PdfUrl,
+                IsActive = book.IsActive
+            };
+        }
+
+        public async Task<BookDto> ActivateBook(int id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null) return null;
+            book.IsActive = true;
+            await _context.SaveChangesAsync();
+            return new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                Publication = book.Publication,
+                Stock = book.Stock,
+                PdfUrl = book.PdfUrl,
+                IsActive = book.IsActive
             };
         }
     }

@@ -187,5 +187,72 @@ namespace LibraryManagement.API.Controllers
             }
             return Ok(new { Success = true, Data = student });
         }
+
+        [HttpDelete("books/{id}")]
+        public async Task<IActionResult> DeleteBook(int id)
+        {
+            try
+            {
+                await _libraryService.DeleteBook(id);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Book deleted successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    Success = false,
+                    Message = $"Failed to delete book: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpPatch("books/{id}/deactivate")]
+        public async Task<IActionResult> DeactivateBook(int id)
+        {
+            try
+            {
+                await _libraryService.DeactivateBook(id);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Book deactivated successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    Success = false,
+                    Message = $"Failed to deactivate book: {ex.Message}"
+                });
+            }
+
+        }
+
+        [HttpPatch("books/{id}/activate")]
+        public async Task<IActionResult> ActivateBook(int id)
+        {
+            try
+            {
+                await _libraryService.ActivateBook(id);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Book activated successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    Success = false,
+                    Message = $"Failed to activate book: {ex.Message}"
+                });
+            }
+        }
     }
 }
