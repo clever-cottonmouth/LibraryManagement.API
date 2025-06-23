@@ -192,5 +192,12 @@ namespace LibraryManagement.API.Services
                 })
                 .ToListAsync();
         }
+
+        public async Task<List<Notification>> Notifications()
+        {
+            return await _context.Notifications
+                .Include(n => n.Student)
+                .ToListAsync();
+        }
     }
 }

@@ -143,5 +143,16 @@ namespace LibraryManagement.API.Controllers
                 Data = books
             });
         }
+
+        [HttpGet("notifications")]
+        public async Task<IActionResult> GetNotifications()
+        {
+            var notifications = await _libraryService.Notifications();
+            return Ok(new
+            {
+                Success = true,
+                Data = notifications
+            });
         }
+    }
 }
