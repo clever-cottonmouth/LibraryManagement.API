@@ -145,7 +145,7 @@ namespace LibraryManagement.API.Services
                     Author = b.Author,
                     Publication = b.Publication,
                     Stock = b.Stock,
-                    PdfFile = b.PdfUrl,
+                    PdfFile = b.PdfUrl ?? string.Empty,
                     IsActive = b.IsActive
                 })
                 .ToListAsync();
@@ -206,7 +206,7 @@ namespace LibraryManagement.API.Services
                     Author = b.Author,
                     Publication = b.Publication,
                     Stock = b.Stock,
-                    PdfFile = b.PdfUrl,
+                    PdfFile = b.PdfUrl ?? string.Empty,
                     IsActive = b.IsActive
                 })
                 .ToListAsync();
@@ -242,21 +242,13 @@ namespace LibraryManagement.API.Services
             };
         }
 
-        public async Task<BookDto> DeleteBook(int id)
+        public async Task<bool> DeleteBook(int id)
         {
             var book = await _context.Books.FindAsync(id);
-            if (book == null) return null;
+            if (book == null) return false;
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
-            return new BookDto
-            {
-                Id = book.Id,
-                Title = book.Title,
-                Author = book.Author,
-                Publication = book.Publication,
-                Stock = book.Stock,
-                PdfFile = book.PdfUrl
-            };
+            return true;
         }
 
         public async Task<BookDto> DeactivateBook(int id)
@@ -272,7 +264,7 @@ namespace LibraryManagement.API.Services
                 Author = book.Author,
                 Publication = book.Publication,
                 Stock = book.Stock,
-                PdfFile = book.PdfUrl,
+                PdfFile = book.PdfUrl ?? string.Empty,
                 IsActive = book.IsActive
             };
         }
@@ -290,7 +282,7 @@ namespace LibraryManagement.API.Services
                 Author = book.Author,
                 Publication = book.Publication,
                 Stock = book.Stock,
-                PdfFile = book.PdfUrl,
+                PdfFile = book.PdfUrl ?? string.Empty,
                 IsActive = book.IsActive
             };
         }

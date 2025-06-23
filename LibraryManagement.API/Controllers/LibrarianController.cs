@@ -202,7 +202,15 @@ namespace LibraryManagement.API.Controllers
         {
             try
             {
-                await _libraryService.DeleteBook(id);
+                var success = await _libraryService.DeleteBook(id);
+                if (!success)
+                {
+                    return NotFound(new
+                    {
+                        Success = false,
+                        Message = "Book not found"
+                    });
+                }
                 return Ok(new
                 {
                     Success = true,
@@ -211,7 +219,7 @@ namespace LibraryManagement.API.Controllers
             }
             catch (Exception ex)
             {
-                return Ok(new
+                return StatusCode(500, new
                 {
                     Success = false,
                     Message = $"Failed to delete book: {ex.Message}"
