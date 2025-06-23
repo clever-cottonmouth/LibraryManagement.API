@@ -1,6 +1,8 @@
 ﻿using LibraryManagement.API.Data;
 using LibraryManagement.API.DTOs;
 using LibraryManagement.API.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -132,7 +134,7 @@ namespace LibraryManagement.API.Services
         }
 
 
-       
+
         public async Task<List<StudentDto>> SearchStudents(string query)
         {
             return await _context.Students
@@ -198,6 +200,29 @@ namespace LibraryManagement.API.Services
             return await _context.Notifications
                 .Include(n => n.Student)
                 .ToListAsync();
+        }
+
+        public async Task<IActionResult> DeleteStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return new NotFoundResult();
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync();
+            return new OkResult();
+        }
+
+        public async Task<StudentDto> StudentById(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return null;
+            return new StudentDto
+            {
+                Id = student.Id,
+                Email = student.Email,
+                Name = student.Name,
+                IsActive = student.IsActive,
+                IsVerified = student.IsVerified
+            };
         }
     }
 }

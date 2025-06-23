@@ -154,5 +154,38 @@ namespace LibraryManagement.API.Controllers
                 Data = notifications
             });
         }
+
+        [HttpDelete("students/{id}")]
+        public async Task<IActionResult> DeleteStudent(int id)
+        {
+            try
+            {
+                await _libraryService.DeleteStudent(id);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Student deleted successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    Success = false,
+                    Message = $"Failed to delete student: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpGet("students/{id}")]
+        public async Task<IActionResult> GetStudentById(int id)
+        {
+            var student = await _libraryService.StudentById(id);
+            if (student == null)
+            {
+                return NotFound(new { Success = false, Message = "Student not found" });
+            }
+            return Ok(new { Success = true, Data = student });
+        }
     }
 }
