@@ -1,11 +1,12 @@
-﻿using LibraryManagement.API.Data;
+﻿using Azure.Core;
+using LibraryManagement.API.Data;
 using LibraryManagement.API.DTOs;
 using LibraryManagement.API.Models;
 using LibraryManagement.API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
 
 namespace LibraryManagement.API.Controllers
 {
@@ -84,8 +85,31 @@ namespace LibraryManagement.API.Controllers
         [HttpPost("issue")]
         public async Task<IActionResult> IssueBook([FromBody] BookIssueDto issueDto)
         {
-            await _libraryService.IssueBook(issueDto.StudentId, issueDto.BookId);
-            return Ok("Book issued");
+            try
+            {
+                await _libraryService.IssueBook(issueDto.StudentId, issueDto.BookId);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Book issued successfully"
+                });
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new
+                {
+                    Success = false,
+                    Message = "An unexpected error occurred"
+                });
+            }
         }
 
         [HttpPost("return/{issueId}")]

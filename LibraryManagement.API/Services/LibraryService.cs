@@ -81,16 +81,16 @@ namespace LibraryManagement.API.Services
             var settings = await _context.LibrarySettings.FirstOrDefaultAsync();
 
             if (student == null || book == null || settings == null)
-                throw new Exception("Invalid student, book, or settings");
+                throw new ApplicationException("Invalid student, book, or settings");
 
             if (!student.IsActive || !student.IsVerified)
-                throw new Exception("Student account not active or verified");
+                throw new ApplicationException("Student account not active or verified");
 
             if (student.BooksIssued >= settings.MaxBookLimit)
-                throw new Exception("Book limit exceeded");
+                throw new ApplicationException("Book limit exceeded");
 
             if (book.Stock <= 0)
-                throw new Exception("Book out of stock");
+                throw new ApplicationException("Book out of stock");
 
             var issue = new BookIssue
             {
