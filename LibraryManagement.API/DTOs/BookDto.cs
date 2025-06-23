@@ -13,10 +13,6 @@ namespace LibraryManagement.API.DTOs
         public string Author { get; set; }
         public string Publication { get; set; }
         public int Stock { get; set; }
-        /// <summary>
-        /// The relative path to the PDF file associated with the book.
-        /// </summary>
-        public string PdfFile { get; set; }
         public bool IsActive { get; set; }
         
     }

@@ -145,7 +145,6 @@ namespace LibraryManagement.API.Services
                     Author = b.Author,
                     Publication = b.Publication,
                     Stock = b.Stock,
-                    PdfFile = b.PdfUrl ?? string.Empty,
                     IsActive = b.IsActive
                 })
                 .ToListAsync();
@@ -206,7 +205,6 @@ namespace LibraryManagement.API.Services
                     Author = b.Author,
                     Publication = b.Publication,
                     Stock = b.Stock,
-                    PdfFile = b.PdfUrl ?? string.Empty,
                     IsActive = b.IsActive
                 })
                 .ToListAsync();
@@ -264,7 +262,6 @@ namespace LibraryManagement.API.Services
                 Author = book.Author,
                 Publication = book.Publication,
                 Stock = book.Stock,
-                PdfFile = book.PdfUrl ?? string.Empty,
                 IsActive = book.IsActive
             };
         }
@@ -282,7 +279,6 @@ namespace LibraryManagement.API.Services
                 Author = book.Author,
                 Publication = book.Publication,
                 Stock = book.Stock,
-                PdfFile = book.PdfUrl ?? string.Empty,
                 IsActive = book.IsActive
             };
         }

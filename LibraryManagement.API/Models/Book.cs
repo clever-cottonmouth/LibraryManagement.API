@@ -12,7 +12,6 @@ namespace LibraryManagement.API.Models
         public string? Title { get; set; } // Nullable string
         public string? Author { get; set; }
         public string? Publication { get; set; }
-        public string? PdfFile { get; set; }
         public string? PdfUrl { get; set; }
         public int Stock { get; set; }
         public bool IsActive { get; set; }
