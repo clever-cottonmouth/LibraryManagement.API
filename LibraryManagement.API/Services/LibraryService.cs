@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace LibraryManagement.API.Services
 {
@@ -43,7 +45,7 @@ namespace LibraryManagement.API.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddBook(BookDto bookDto)
+        public async Task AddBook(BookDto bookDto, IFormFile pdfFile)
         {
             var book = new Book
             {
@@ -52,8 +54,22 @@ namespace LibraryManagement.API.Services
                 Publication = bookDto.Publication,
                 Stock = bookDto.Stock,
                 IsActive = true,
-                PdfUrl = bookDto.PdfUrl,
             };
+
+            if (pdfFile != null && pdfFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine("wwwroot", "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(pdfFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await pdfFile.CopyToAsync(stream);
+                }
+                book.PdfUrl = Path.Combine("uploads", fileName).Replace("\\", "/");
+            }
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
         }
@@ -129,14 +145,11 @@ namespace LibraryManagement.API.Services
                     Author = b.Author,
                     Publication = b.Publication,
                     Stock = b.Stock,
-                    PdfUrl = b.PdfUrl,
+                    PdfFile = b.PdfUrl,
                     IsActive = b.IsActive
-
                 })
                 .ToListAsync();
         }
-
-
 
         public async Task<List<StudentDto>> SearchStudents(string query)
         {
@@ -193,7 +206,7 @@ namespace LibraryManagement.API.Services
                     Author = b.Author,
                     Publication = b.Publication,
                     Stock = b.Stock,
-                    PdfUrl = b.PdfUrl,
+                    PdfFile = b.PdfUrl,
                     IsActive = b.IsActive
                 })
                 .ToListAsync();
@@ -242,7 +255,7 @@ namespace LibraryManagement.API.Services
                 Author = book.Author,
                 Publication = book.Publication,
                 Stock = book.Stock,
-                PdfUrl = book.PdfUrl
+                PdfFile = book.PdfUrl
             };
         }
 
@@ -259,7 +272,7 @@ namespace LibraryManagement.API.Services
                 Author = book.Author,
                 Publication = book.Publication,
                 Stock = book.Stock,
-                PdfUrl = book.PdfUrl,
+                PdfFile = book.PdfUrl,
                 IsActive = book.IsActive
             };
         }
@@ -277,7 +290,7 @@ namespace LibraryManagement.API.Services
                 Author = book.Author,
                 Publication = book.Publication,
                 Stock = book.Stock,
-                PdfUrl = book.PdfUrl,
+                PdfFile = book.PdfUrl,
                 IsActive = book.IsActive
             };
         }

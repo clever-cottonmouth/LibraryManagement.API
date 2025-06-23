@@ -25,6 +25,7 @@
   <ItemGroup>
     <Folder Include="Middleware\" />
     <Folder Include="Extensions\" />
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 </Project>

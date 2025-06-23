@@ -5,6 +5,7 @@ using LibraryManagement.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace LibraryManagement.API.Controllers
 {
@@ -62,9 +63,16 @@ namespace LibraryManagement.API.Controllers
         }
 
         [HttpPost("books")]
-        public async Task<IActionResult> AddBook([FromBody] BookDto bookDto)
+        public async Task<IActionResult> AddBook([FromForm] AddBookFormDto form)
         {
-            await _libraryService.AddBook(bookDto);
+            var bookDto = new BookDto
+            {
+                Title = form.Title,
+                Author = form.Author,
+                Publication = form.Publication,
+                Stock = form.Stock
+            };
+            await _libraryService.AddBook(bookDto, form.PdfFile);
             return Ok(new
             {
                 Success = true,
@@ -140,6 +148,7 @@ namespace LibraryManagement.API.Controllers
             return Ok(new
             {
                 Success = true,
+                // Data includes PdfFile property, which is the path to the PDF file for each book
                 Data = books
             });
         }

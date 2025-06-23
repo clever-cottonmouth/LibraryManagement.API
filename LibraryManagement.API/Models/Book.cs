@@ -14,6 +14,7 @@ namespace LibraryManagement.API.Models
         public string Publication { get; set; }
         public int Stock { get; set; }
         public bool IsActive { get; set; }
+        public string PdfFile { get; set; }
         public string PdfUrl { get; set; }
     }
 }
