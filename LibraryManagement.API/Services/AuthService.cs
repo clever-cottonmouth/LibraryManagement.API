@@ -141,7 +141,7 @@ namespace LibraryManagement.API.Services
             return Convert.ToBase64String(hashBytes);
         }
 
-        private bool VerifyPassword(string password, string storedHash)
+        public bool VerifyPassword(string password, string storedHash)
         {
             if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(storedHash))
                 return false;
@@ -195,6 +195,33 @@ namespace LibraryManagement.API.Services
                 return null;
 
             return GenerateJwtToken(student.Email, "Student");
+        }
+
+
+        public async Task<StudentDto> ChangePassword(string email, UpdatePasswordDto form)
+        {
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+            if(student ==null || !VerifyPassword(form.OldPassword, student.PasswordHash))
+            {
+                return null;
+            }
+
+            if (form.NewPassword != form.ConfirmPassword)
+            {
+                return null;
+            }
+            student.PasswordHash = HashPassword(form.NewPassword);
+            _context.Students.Update(student);
+            await _context.SaveChangesAsync();
+            return new StudentDto
+            {
+                Id = student.Id,
+                Email = student.Email,
+                Name = student.Name,
+                IsActive = student.IsActive,
+                IsVerified = student.IsVerified
+            };
+
         }
     }
 }

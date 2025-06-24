@@ -109,13 +109,59 @@ namespace LibraryManagement.API.Controllers
             var existingStudent = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
             if (existingStudent == null) throw new Exception("Student not found");
             existingStudent.Name = student.Name;
- 
+
             _context.Students.Update(existingStudent);
             await _context.SaveChangesAsync();
             return Ok(new
             {
                 Email = email,
                 Name = existingStudent.Name,
+            });
+        }
+
+        [HttpPut("change-password/{email}")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> ChangePassword(string email, [FromBody] UpdatePasswordDto form)
+        {
+            if (form == null)
+            {
+                return BadRequest(new { Error = "Invalid request data." });
+            }
+            if (string.IsNullOrWhiteSpace(form.OldPassword) || string.IsNullOrWhiteSpace(form.NewPassword) || string.IsNullOrWhiteSpace(form.ConfirmPassword))
+            {
+                return BadRequest(new { Error = "All password fields are required." });
+            }
+            if (form.NewPassword.Length < 6)
+            {
+                return BadRequest(new { Error = "New password must be at least 6 characters long." });
+            }
+            var result = await _authService.ChangePassword(email, form);
+            if (result == null)
+            {
+                // Determine the specific error
+                var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+                if (student == null)
+                {
+                    return NotFound(new { Error = "Student not found." });
+                }
+                else if (form.NewPassword != form.ConfirmPassword)
+                {
+                    return BadRequest(new { Error = "New password and confirmation do not match." });
+                }
+                else if (!_authService.VerifyPassword(form.OldPassword, student.PasswordHash))
+                {
+                    return BadRequest(new { Error = "Old password is incorrect." });
+                }
+                else
+                {
+                    return BadRequest(new { Error = "Failed to update password. Please try again." });
+                }
+            }
+            return Ok(new
+            {
+                Message = "Password updated successfully",
+                Success = true,
+                Student = result
             });
         }
     }
