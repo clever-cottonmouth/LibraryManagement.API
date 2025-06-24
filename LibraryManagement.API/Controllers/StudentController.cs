@@ -17,10 +17,11 @@ namespace LibraryManagement.API.Controllers
         private readonly AuthService _authService;
         private readonly LibraryContext _context;
 
-        public StudentController(LibraryService libraryService, AuthService authService)
+        public StudentController(LibraryService libraryService, AuthService authService, LibraryContext context)
         {
             _libraryService = libraryService;
             _authService = authService;
+            _context = context;
         }
 
         [HttpPost("register")]
@@ -75,24 +76,18 @@ namespace LibraryManagement.API.Controllers
         //    return Ok(issues);
         //}
 
-        [HttpGet("issued-books")]
+        [HttpGet("issued-books/{email}")]
         [Authorize(Roles = "Student")]
-        public async Task<IActionResult> GetIssuedBooks()
+        public async Task<IActionResult> GetIssuedBooks(string email)
         {
-            var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
-            Guid studentGuid;
-            if (!Guid.TryParse(jti, out studentGuid))
-            {
-                return BadRequest("Invalid token identifier.");
-            }
-            // If you need to map the GUID to a student, do so here.
-            // Example: var student = await _context.Students.FirstOrDefaultAsync(s => s.Guid == studentGuid);
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+            if (student == null) throw new Exception("Student not found");
+            var issues = await _context.BookIssues
+                .Include(i => i.Book)
+                .Where(i => i.StudentId == student.Id && i.ReturnDate == null)
+                .ToListAsync();
+            return Ok(issues);
 
-            // If you still need StudentId (int), consider storing it in another claim, e.g., "sub":
-            // var studentId = int.Parse(User.FindFirst(JwtRegisteredClaimNames.Sub).Value);
-
-            // For demonstration, just return the GUID:
-            return Ok(new { Jti = studentGuid });
         }
 
         [HttpPost("notifications/reply/{id}")]
