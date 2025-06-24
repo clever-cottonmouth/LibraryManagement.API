@@ -235,7 +235,7 @@ namespace LibraryManagement.API.Services
                 .ToListAsync();
         }
 
-        public async Task<List<Notification>> Notifications()
+        public async Task<List<Notification>> Notifications(string message)
         {
             return await _context.Notifications
                 .Include(n => n.Student)
@@ -422,6 +422,39 @@ namespace LibraryManagement.API.Services
             return Convert.ToBase64String(hashBytes);
         }
 
-        
+        public async Task<IActionResult> SendNotifications(string message)
+        {
+            // Fetch all students
+            var students = await _context.Students.ToListAsync();
+            if (students == null || !students.Any())
+            {
+                return new NotFoundResult();
+            }
+
+            // Delete all existing notifications
+            var existingNotifications = await _context.Notifications.ToListAsync();
+            if (existingNotifications.Any())
+            {
+                _context.Notifications.RemoveRange(existingNotifications);
+            }
+
+            // Create new notifications
+            var notifications = new List<Notification>();
+            foreach (var student in students)
+            {
+                var notification = new Notification
+                {
+                    StudentId = student.Id,
+                    Message = message
+                };
+                notifications.Add(notification);
+            }
+
+            // Add new notifications
+            _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
+
+            return new OkObjectResult(notifications);
+        }
     }
 }

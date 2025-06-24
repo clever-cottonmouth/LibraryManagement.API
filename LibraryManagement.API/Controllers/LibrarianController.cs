@@ -241,15 +241,39 @@ namespace LibraryManagement.API.Controllers
         }
 
         [HttpGet("notifications")]
-        public async Task<IActionResult> GetNotifications()
+        public async Task<IActionResult> GetNotifications([FromBody] string message)
         {
-            var notifications = await _libraryService.Notifications();
+            var notifications = await _libraryService.Notifications(message);
             return Ok(new
             {
                 Success = true,
                 Data = notifications
             });
         }
+
+        [HttpPost("sendNotifications")]
+        public async Task<IActionResult> SendNotifications([FromBody] SendNotificationsDto request)
+        {
+            if (string.IsNullOrEmpty(request?.Message))
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "The message field is required."
+                });
+            }
+
+            var notifications = await _libraryService.SendNotifications(request.Message);
+            return Ok(new
+            {
+                Success = true,
+                Message = "Notifications sent successfully",
+                Data = notifications
+            });
+        }
+
+
+
 
         [HttpDelete("students/{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
@@ -435,6 +459,8 @@ namespace LibraryManagement.API.Controllers
                 });
             }
         }
+
+
 
 
     }
