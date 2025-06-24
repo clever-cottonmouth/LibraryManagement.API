@@ -154,8 +154,32 @@ namespace LibraryManagement.API.Controllers
         [HttpPost("return/{issueId}")]
         public async Task<IActionResult> ReturnBook(int issueId)
         {
-            await _libraryService.ReturnBook(issueId);
-            return Ok("Book returned");
+            try
+            {
+                await _libraryService.ReturnBook(issueId);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Book returned successfully"
+                });
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new
+                {
+                    Success = false,
+                    Message = "An unexpected error occurred"
+                });
+            }
+
         }
 
         [HttpGet("books")]

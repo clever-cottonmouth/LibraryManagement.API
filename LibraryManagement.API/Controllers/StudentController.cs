@@ -37,7 +37,7 @@ namespace LibraryManagement.API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var token = await _authService.StudentLogin(loginDto);
-            return Ok(new { Token = token, Email= loginDto.Email });
+            return Ok(new { Token = token, Email = loginDto.Email });
         }
 
         [HttpPost("forgot-password")]
@@ -99,6 +99,24 @@ namespace LibraryManagement.API.Controllers
             notification.Reply = reply;
             await _context.SaveChangesAsync();
             return Ok("Reply sent");
+        }
+
+
+        [HttpPatch("profile-update/{email}")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> ProfileUpdate(string email, [FromBody] StudentDto student)
+        {
+            var existingStudent = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+            if (existingStudent == null) throw new Exception("Student not found");
+            existingStudent.Name = student.Name;
+ 
+            _context.Students.Update(existingStudent);
+            await _context.SaveChangesAsync();
+            return Ok(new
+            {
+                Email = email,
+                Name = existingStudent.Name,
+            });
         }
     }
 }
