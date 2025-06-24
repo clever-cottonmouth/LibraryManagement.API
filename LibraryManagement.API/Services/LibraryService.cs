@@ -1,16 +1,18 @@
-﻿using LibraryManagement.API.Data;
+﻿using Konscious.Security.Cryptography;
+using LibraryManagement.API.Data;
 using LibraryManagement.API.DTOs;
 using LibraryManagement.API.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using System.IO;
 
 namespace LibraryManagement.API.Services
 {
@@ -29,7 +31,7 @@ namespace LibraryManagement.API.Services
             {
                 Email = studentDto.Email,
                 Name = studentDto.Name,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("DefaultPassword123"),
+                PasswordHash = HashPassword("Password123"),
                 IsActive = true,
                 IsVerified = false
             };
@@ -376,6 +378,34 @@ namespace LibraryManagement.API.Services
                 IsActive = student.IsActive,
                 IsVerified = student.IsVerified
             };
+        }
+
+        private string HashPassword(string password)
+        {
+            // Convert password to bytes
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+            // Configure Argon2 (Argon2id is recommended for password hashing)
+            using var hasher = new Argon2id(passwordBytes)
+            {
+                DegreeOfParallelism = 4, // Number of threads
+                MemorySize = 65536,      // 64 MB memory
+                Iterations = 4           // Number of iterations
+            };
+
+            // Generate a random salt (16 bytes recommended)
+            byte[] salt = RandomNumberGenerator.GetBytes(16);
+            hasher.Salt = salt;
+
+            // Compute the hash
+            byte[] hash = hasher.GetBytes(32); // 32-byte hash
+
+            // Combine salt and hash for storage (base64 for simplicity)
+            byte[] hashBytes = new byte[salt.Length + hash.Length];
+            Buffer.BlockCopy(salt, 0, hashBytes, 0, salt.Length);
+            Buffer.BlockCopy(hash, 0, hashBytes, salt.Length, hash.Length);
+
+            return Convert.ToBase64String(hashBytes);
         }
     }
 }
