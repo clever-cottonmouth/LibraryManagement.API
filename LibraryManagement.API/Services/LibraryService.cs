@@ -27,16 +27,29 @@ namespace LibraryManagement.API.Services
 
         public async Task AddStudent(StudentDto studentDto)
         {
-            var student = new Student
+            try { 
+                if (await _context.Students.AnyAsync(s => s.Email == studentDto.Email))
+                {
+                    throw new Exception("Student with this email already exists");
+                }
+                else
+                {
+                    var student = new Student
+                    {
+                        Email = studentDto.Email,
+                        Name = studentDto.Name,
+                        IsActive = true,
+                        IsVerified = false,
+                        PasswordHash = HashPassword("Password123"),
+                    };
+                    _context.Students.Add(student);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch
             {
-                Email = studentDto.Email,
-                Name = studentDto.Name,
-                PasswordHash = HashPassword("Password123"),
-                IsActive = true,
-                IsVerified = false
-            };
-            _context.Students.Add(student);
-            await _context.SaveChangesAsync();
+                throw new Exception("Student with this email already exists");
+            }
         }
 
         public async Task DeactivateStudent(int studentId)
@@ -195,6 +208,7 @@ namespace LibraryManagement.API.Services
         public async Task<List<StudentDto>> StudentsList()
         {
             return await _context.Students
+                 .OrderByDescending(s => s.Id)
                  .Select(s => new StudentDto
                  {
                      Id = s.Id,
