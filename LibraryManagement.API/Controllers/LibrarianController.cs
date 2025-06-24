@@ -19,10 +19,11 @@ namespace LibraryManagement.API.Controllers
         private readonly AuthService _authService;
         private readonly LibraryContext _context;
 
-        public LibrarianController(LibraryService libraryService, AuthService authService)
+        public LibrarianController(LibraryService libraryService, AuthService authService, LibraryContext context)
         {
             _libraryService = libraryService;
             _authService = authService;
+            _context = context;
         }
 
         [HttpPost("login")]
