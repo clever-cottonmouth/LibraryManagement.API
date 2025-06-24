@@ -101,6 +101,18 @@ namespace LibraryManagement.API.Controllers
             return Ok("Reply sent");
         }
 
+        [HttpGet("notifications/{email}")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> GetNotifications(string email)
+        {
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+            if (student == null) throw new Exception("Student not found");
+            var notifications = await _context.Notifications
+                .Where(n => n.StudentId == student.Id)
+                .ToListAsync();
+            return Ok(notifications);
+        }
+
 
         [HttpPatch("profile-update/{email}")]
         [Authorize(Roles = "Student")]
