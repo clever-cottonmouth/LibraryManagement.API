@@ -43,6 +43,15 @@ namespace LibraryManagement.API.Services
             if (student == null) throw new Exception("Student not found");
             student.IsActive = false;
             await _context.SaveChangesAsync();
+
+        }
+
+        public async Task ActivateStudent(int studentId)
+        {
+            var student = await _context.Students.FindAsync(studentId);
+            if (student == null) throw new Exception("Student not found");
+            student.IsActive = true;
+            await _context.SaveChangesAsync();
         }
 
         public async Task AddBook(BookDto bookDto, IFormFile pdfFile)
@@ -135,8 +144,8 @@ namespace LibraryManagement.API.Services
         {
             return await _context.Books
                 .Where(b => string.IsNullOrEmpty(query) ||
-                b.Title.Contains(query) 
-                || b.Author.Contains(query) 
+                b.Title.Contains(query)
+                || b.Author.Contains(query)
                 || b.Publication.Contains(query))
                 .Select(b => new BookDto
                 {
@@ -351,6 +360,22 @@ namespace LibraryManagement.API.Services
 
             _context.Books.Update(book);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<StudentDto> VerifyStudent(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null) return null;
+            student.IsVerified = true;
+            await _context.SaveChangesAsync();
+            return new StudentDto
+            {
+                Id = student.Id,
+                Email = student.Email,
+                Name = student.Name,
+                IsActive = student.IsActive,
+                IsVerified = student.IsVerified
+            };
         }
     }
 }

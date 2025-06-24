@@ -56,11 +56,49 @@ namespace LibraryManagement.API.Controllers
             }
         }
 
-        [HttpPut("students/{id}/deactivate")]
+        [HttpPatch("students/{id}/deactivate")]
         public async Task<IActionResult> DeactivateStudent(int id)
         {
-            await _libraryService.DeactivateStudent(id);
-            return Ok("Student deactivated");
+            try
+            {
+                await _libraryService.DeactivateStudent(id);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Student deactivated successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    Success = false,
+                    Message = $"Failed to deactivate student: {ex.Message}"
+                });
+            }
+
+        }
+
+        [HttpPatch("students/{id}/activate")]
+        public async Task<IActionResult> ActivateStudent(int id)
+        {
+            try
+            {
+                await _libraryService.ActivateStudent(id);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Student activated successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    Success = false,
+                    Message = $"Failed to activate student: {ex.Message}"
+                });
+            }
         }
 
         [HttpPost("books")]
@@ -350,5 +388,29 @@ namespace LibraryManagement.API.Controllers
                 });
             }
         }
-    }
+
+        [HttpPatch("students/{id}/verify")]
+        public async Task<IActionResult> VerifyStudent(int id)
+        {
+            try
+            {
+                await _libraryService.VerifyStudent(id);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Student verified successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = $"Failed to verify student: {ex.Message}"
+                });
+            }
+        }
+
+       
+        }
 }
