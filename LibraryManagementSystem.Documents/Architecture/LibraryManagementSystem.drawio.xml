@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0" version="27.1.6">
+  <diagram name="Page-1" id="TT40bncGcBOVJWfFjVXi">
+    <mxGraphModel dx="1418" dy="786" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="yOko-cQXvRZ-0w8NepS5-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="yOko-cQXvRZ-0w8NepS5-1" target="yOko-cQXvRZ-0w8NepS5-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="yOko-cQXvRZ-0w8NepS5-1" value="Librarian Portal&lt;div&gt;(Angular)&lt;/div&gt;&lt;div&gt;- Login&lt;/div&gt;&lt;div&gt;- Student Mgmt&lt;/div&gt;&lt;div&gt;- Book Mgmt&lt;/div&gt;&lt;div&gt;- Search&lt;/div&gt;&lt;div&gt;- Penalty Rules&lt;/div&gt;&lt;div&gt;- Reports&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="70" y="140" width="180" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="yOko-cQXvRZ-0w8NepS5-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="yOko-cQXvRZ-0w8NepS5-2" target="yOko-cQXvRZ-0w8NepS5-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="yOko-cQXvRZ-0w8NepS5-2" value="Student Portal&lt;div&gt;(Angular)&lt;/div&gt;&lt;div&gt;- Register/Login&lt;/div&gt;&lt;div&gt;- Forgot Password&lt;/div&gt;&lt;div&gt;- Profile Update&lt;/div&gt;&lt;div&gt;- Book Search&lt;/div&gt;&lt;div&gt;- Issue Books&lt;/div&gt;&lt;div&gt;- Notifications&lt;/div&gt;&lt;div&gt;- Logout&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="60" y="390" width="190" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="yOko-cQXvRZ-0w8NepS5-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="yOko-cQXvRZ-0w8NepS5-3" target="yOko-cQXvRZ-0w8NepS5-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="yOko-cQXvRZ-0w8NepS5-3" value="Applications Layer&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;.Net Core Backend(Restful APIs)&lt;/div&gt;&lt;div&gt;- Authentication APIs&lt;/div&gt;&lt;div&gt;- Student Management APIs&lt;/div&gt;&lt;div&gt;- Book Management APIs&lt;/div&gt;&lt;div&gt;- Penalty &amp;amp; Limit APIs&lt;/div&gt;&lt;div&gt;- Notification APIs&lt;/div&gt;&lt;div&gt;- File Management APIs&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Business Logic:&lt;/div&gt;&lt;div&gt;- Validate inputs (e.g , CAPTCHA, credentials)&lt;/div&gt;&lt;div&gt;- Manage book issue/return&lt;/div&gt;&lt;div&gt;- Calculate penalties&lt;/div&gt;&lt;div&gt;- Handle file upload/downloads&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;External Integrations:&lt;/div&gt;&lt;div&gt;- Email Service (Sendgrid)&lt;/div&gt;&lt;div&gt;- File Storage (Cloud)&lt;/div&gt;&lt;div&gt;- CAPTCHA Service (e.g., hCaptcha)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;align=center;" vertex="1" parent="1">
+          <mxGeometry x="350" y="160" width="350" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="yOko-cQXvRZ-0w8NepS5-6" value="Data Layer&lt;div&gt;- User Table (Librarian, Student)&lt;/div&gt;&lt;div&gt;- Books Table&lt;/div&gt;&lt;div&gt;- Book Transaction Table&lt;/div&gt;&lt;div&gt;- Penalty Rule Table&lt;/div&gt;&lt;div&gt;- Notification Table&lt;/div&gt;&lt;div&gt;- Audit Log Table (Optional)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Operations:&lt;/div&gt;&lt;div&gt;- Crud for users, books, transactions&lt;/div&gt;&lt;div&gt;- Search queries (books, students)&lt;/div&gt;&lt;div&gt;- Join for reports (issued books, stocks)&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="347.5" y="580" width="355" height="355" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

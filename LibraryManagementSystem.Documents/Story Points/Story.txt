@@ -1,0 +1,313 @@
+--=============Librarian Portal User Stories and Story Points
+Librarian Login
+User Story: As a librarian, I want to log in with my credentials so that I can access the portal securely.
+
+Tasks:
+Create login UI (Angular/React).
+
+Develop authentication API (.NET Core) with JWT or similar.
+
+Store and validate hashed passwords in SQL database.
+
+Handle invalid login attempts.
+
+Story Points: 3
+Moderate complexity due to authentication logic and security (hashing, JWT).
+
+Add/Remove/Deactivate Students
+User Story: As a librarian, I want to add, remove, or deactivate student accounts so that I can manage student access.
+
+Tasks:
+Create UI forms for adding/removing/deactivating students.
+
+Develop APIs for CRUD operations on student records.
+
+Update student status in SQL database.
+
+Validate inputs (e.g., unique email).
+
+Story Points: 5
+Medium complexity due to multiple operations and validation.
+
+Add New Book Details with PDF/Word Files
+User Story: As a librarian, I want to add new book details, including optional PDF/Word files, so that students can access them.
+
+Tasks:
+Create UI form for book details and file upload.
+
+Develop API to handle book data and file uploads.
+
+Store book metadata in SQL database and files in file system/cloud storage.
+
+Validate file types and sizes.
+
+Story Points: 8
+Complex due to file upload handling and storage integration.
+
+Edit/Delete/Deactivate Book Details
+User Story: As a librarian, I want to edit, delete, or deactivate book details so that I can keep the book catalog updated.
+
+Tasks:
+Create UI for editing/deleting/deactivating books.
+
+Develop APIs for updating/deleting book records.
+
+Handle file updates in storage if applicable.
+
+Update SQL database.
+
+Story Points: 5
+Medium complexity, similar to student management but simpler than file uploads.
+
+Verify, Approve, or Block Student Accounts
+User Story: As a librarian, I want to verify, approve, or block student accounts so that I can control access to the system.
+
+Tasks:
+Create UI to display pending student accounts and approve/block options.
+
+Develop APIs to update student status.
+
+Store status changes in SQL database.
+
+Notify students via email on approval/block (optional).
+
+Story Points: 5
+Medium complexity due to status management and potential email integration.
+
+Issue Books to Students
+User Story: As a librarian, I want to issue books to students so that they can borrow them.
+
+Tasks:
+Create UI for selecting student and book to issue.
+
+Develop API to create book transaction record.
+
+Update book stock and transaction table in SQL database.
+
+Validate maximum book limit.
+
+Story Points: 5
+Medium complexity due to transaction logic and validation.
+
+Return Books and Update Stock
+User Story: As a librarian, I want to record book returns so that stock is updated and penalties are calculated.
+
+Tasks:
+Create UI for recording book returns.
+
+Develop API to update transaction record and book stock.
+
+Calculate penalties based on return date and per-day rate.
+
+Update SQL database.
+
+Story Points: 5
+Medium complexity due to penalty calculation and database updates.
+
+View All Books with Stock
+User Story: As a librarian, I want to view all books with their stock details so that I can manage the library inventory.
+
+Tasks:
+Create UI table to display books and stock.
+
+Develop API to fetch book data from SQL database.
+
+Optimize database query for performance.
+
+Story Points: 3
+Moderate complexity due to simple data retrieval and display.
+
+Search Books
+User Story: As a librarian, I want to search books by title, publication, or author so that I can find them quickly.
+
+Tasks:
+Create UI search bar with filters.
+
+Develop API to query books by title, publication, or author.
+
+Optimize SQL database with indexes for search.
+
+Story Points: 5
+Medium complexity due to search logic and database optimization.
+
+Search Students
+User Story: As a librarian, I want to search students by name or ID so that I can find their details quickly.
+
+Tasks:
+Create UI search bar for students.
+
+Develop API to query students by name or ID.
+
+Optimize SQL database with indexes for search.
+
+Story Points: 3
+Moderate complexity, simpler than book search due to fewer fields.
+
+View Students with Issued Books
+User Story: As a librarian, I want to see how many students have books and their details so that I can track borrowing.
+
+Tasks:
+Create UI table to display students and their issued books.
+
+Develop API to fetch transaction data with joins.
+
+Optimize database query for performance.
+
+Story Points: 5
+Medium complexity due to database joins and reporting.
+
+Find Books by Publication or Author
+User Story: As a librarian, I want to find books by publication or author so that I can organize the catalog.
+
+Tasks:
+Reuse search UI with publication/author filters.
+
+Extend search API to include publication/author queries.
+
+Optimize SQL database for these queries.
+
+Story Points: 3
+Moderate complexity, overlaps with book search functionality.
+
+Set Per-Day Penalty
+User Story: As a librarian, I want to set a per-day penalty rate so that late returns are penalized appropriately.
+
+Tasks:
+Create UI form to set penalty rate.
+
+Develop API to update penalty rules in SQL database.
+
+Apply penalty calculation in book return logic.
+
+Story Points: 3
+Moderate complexity due to simple rule management.
+
+Set Maximum Book Limit for Students
+User Story: As a librarian, I want to set a maximum book limit for students so that borrowing is controlled.
+
+Tasks:
+Create UI form to set book limit.
+
+Develop API to update limit rules in SQL database.
+
+Validate limit during book issuance.
+
+Story Points: 3
+Moderate complexity, similar to penalty setting.
+
+--==========================Student Portal User Stories and Story Points
+Student Registration with CAPTCHA
+User Story: As a student, I want to register with a CAPTCHA so that my account is created securely, pending librarian approval.
+
+Tasks:
+Create registration UI form with CAPTCHA integration.
+
+Develop API to handle registration and store pending status.
+
+Integrate CAPTCHA service (e.g., Google reCAPTCHA).
+
+Store student data in SQL database.
+
+Story Points: 8
+Complex due to CAPTCHA integration and pending approval logic.
+
+Student Login and Forgot Password
+User Story: As a student, I want to log in or reset my password via email so that I can access my account securely.
+
+Tasks:
+Create login UI and forgot password form.
+
+Develop APIs for login and password reset.
+
+Integrate email service for reset links.
+
+Update password in SQL database.
+
+Story Points: 8
+Complex due to authentication and email integration.
+
+Update Profile and Change Password
+User Story: As a student, I want to update my profile and change my password so that my details are current.
+
+Tasks:
+Create UI forms for profile and password updates.
+
+Develop APIs to update student data in SQL database.
+
+Validate inputs (e.g., password strength).
+
+Story Points: 5
+Medium complexity due to form validation and database updates.
+
+Search and Download Books
+User Story: As a student, I want to search books and download PDF/Word files if available so that I can access resources.
+
+Tasks:
+Create UI search bar and download buttons.
+
+Reuse book search API from librarian portal.
+
+Develop API to serve downloadable files.
+
+Ensure secure file access (e.g., only for logged-in users).
+
+Story Points: 8
+Complex due to file download and security requirements.
+
+View Issued Books with Details
+User Story: As a student, I want to view my issued books, including submission dates, issue dates, and penalties, so that I can manage my borrowing.
+
+Tasks:
+Create UI table to display issued books and details.
+
+Develop API to fetch student-specific transaction data.
+
+Display penalty calculations from database.
+
+Story Points: 5
+Medium complexity due to transaction data retrieval.
+
+Receive Notifications from Librarian
+User Story: As a student, I want to receive notifications from the librarian so that I am informed of important updates.
+
+Tasks:
+Create UI notification panel.
+
+Develop API to fetch notifications for the student.
+
+Integrate email service for notification delivery.
+
+Story Points: 8
+Complex due to notification system and email integration.
+
+Reply to Librarian Messages
+User Story: As a student, I want to reply to librarian messages so that I can communicate effectively.
+
+Tasks:
+Create UI form for replying to messages.
+
+Develop API to store replies in SQL database.
+
+Update notification table with replies.
+
+Story Points: 5
+Medium complexity due to messaging logic and database updates.
+
+Logout
+User Story: As a student, I want to log out so that my session ends securely.
+
+Tasks:
+Create logout button in UI.
+
+Develop API to invalidate session (e.g., clear JWT).
+
+Story Points: 1
+Simple task with minimal backend logic.
+
+Total Story Points
+Librarian Portal: 3 + 5 + 8 + 5 + 5 + 5 + 5 + 3 + 5 + 3 + 5 + 3 + 3 + 3 = 53 story points
+
+Student Portal: 8 + 8 + 5 + 8 + 5 + 8 + 5 + 1 = 48 story points
+
+Total: 101 story points
+
