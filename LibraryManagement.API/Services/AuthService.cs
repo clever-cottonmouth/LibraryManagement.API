@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Konscious.Security.Cryptography;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Text.Json;
 
 
 namespace LibraryManagement.API.Services
@@ -43,26 +44,53 @@ namespace LibraryManagement.API.Services
             return GenerateJwtToken(librarian.Email, "Librarian");
         }
 
+
         public async Task<string> StudentRegister(LoginDto loginDto)
         {
-            // Validate CAPTCHA (e.g., Google reCAPTCHA)
-            if (!await ValidateCaptcha(loginDto.CaptchaToken))
-                throw new Exception("Invalid CAPTCHA");
-
-            var student = new Student
+            try
             {
-                Email = loginDto.Email,
-                PasswordHash = HashPassword(loginDto.Password),
-                Name = loginDto.Email.Split('@')[0],
-                IsActive = false,
-                IsVerified = false
-            };
+                if (loginDto == null)
+                    throw new ArgumentNullException(nameof(loginDto), "Login data is required");
 
-            _context.Students.Add(student);
-            await _context.SaveChangesAsync();
-            return "Registration successful. Awaiting librarian verification.";
+                if (!await ValidateCaptcha(loginDto.CaptchaToken))
+                    throw new InvalidOperationException("Invalid CAPTCHA");
+
+                var existingStudent = await _context.Students
+                    .FirstOrDefaultAsync(s => s.Email == loginDto.Email);
+
+                if (existingStudent != null)
+                    throw new InvalidOperationException("Student already registered.");
+
+                var student = new Student
+                {
+                    Email = loginDto.Email,
+                    PasswordHash = HashPassword(loginDto.Password),
+                    Name = loginDto.Email.Split('@')[0],
+                    IsActive = false,
+                    IsVerified = false
+                };
+
+                _context.Students.Add(student);
+                await _context.SaveChangesAsync();
+
+                var response = new
+                {
+                    Success = true,
+                    Message = "Registration successful. Awaiting librarian verification."
+                };
+                return JsonSerializer.Serialize(response);
+            }
+            catch (Exception ex)
+            {
+                
+                var response = new
+                {
+                    Success = false,
+                    Message = $"Registration failed: {ex.Message}"
+                };
+                return JsonSerializer.Serialize(response);
+            }
         }
-
         public async Task SendPasswordResetEmail(string email)
         {
             var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
@@ -103,15 +131,6 @@ namespace LibraryManagement.API.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        //private string HashPassword(string password)
-        //{
-        //    return BCrypt.Net.BCrypt.HashPassword(password);
-        //}
-
-        //private bool VerifyPassword(string password, string hash)
-        //{
-        //    return BCrypt.Net.BCrypt.Verify(password, hash);
-        //}
 
         private string HashPassword(string password)
         {
