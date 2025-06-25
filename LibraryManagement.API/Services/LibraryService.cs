@@ -456,5 +456,17 @@ namespace LibraryManagement.API.Services
 
             return new OkObjectResult(notifications);
         }
+
+
+        public async Task<List<LibrarySettingsDto>> GetSettings()
+        {
+            return await _context.LibrarySettings
+                .Select(s => new LibrarySettingsDto
+                {
+                    MaxBookLimit = s.MaxBookLimit,
+                    PenaltyPerDay = s.PenaltyPerDay
+                })
+                .ToListAsync();
+        }
     }
 }

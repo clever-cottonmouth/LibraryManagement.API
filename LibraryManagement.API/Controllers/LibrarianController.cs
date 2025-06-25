@@ -190,7 +190,7 @@ namespace LibraryManagement.API.Controllers
         }
 
         [HttpGet("books/search")]
-        public async Task<IActionResult> SearchBooks([FromQuery] string query="")
+        public async Task<IActionResult> SearchBooks([FromQuery] string query = "")
         {
             var books = await _libraryService.SearchBooks(query);
             return Ok(books);
@@ -218,7 +218,11 @@ namespace LibraryManagement.API.Controllers
         public async Task<IActionResult> UpdateSettings([FromBody] LibrarySettings settings)
         {
             await _libraryService.UpdateSettings(settings.MaxBookLimit, settings.PenaltyPerDay);
-            return Ok("Settings updated");
+            return Ok(new
+            {
+                Success = true,
+                Message = "Settings updated successfully"
+            });
         }
 
         [HttpGet("students/list")]
@@ -418,7 +422,7 @@ namespace LibraryManagement.API.Controllers
                     Author = form.Author,
                     Publication = form.Publication,
                     Stock = form.Stock,
-                    IsActive= true
+                    IsActive = true
                 };
                 await _libraryService.UpdateBook(id, bookDto, form.PdfFile);
                 return Ok(new
@@ -460,8 +464,18 @@ namespace LibraryManagement.API.Controllers
             }
         }
 
-
-
-
+        [HttpGet("settings")]
+        public async Task<IActionResult> GetSettings()
+        {
+            try
+            {
+                var settings = await _libraryService.GetSettings();
+                return Ok(settings);
+            }
+            catch (Exception ex)
+            {         
+                return StatusCode(500, new { Error = "An error occurred while retrieving settings" });
+            }
+        }
     }
 }
