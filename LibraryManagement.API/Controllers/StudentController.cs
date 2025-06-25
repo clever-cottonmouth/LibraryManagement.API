@@ -28,8 +28,24 @@ namespace LibraryManagement.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] LoginDto loginDto)
         {
-            var result = await _authService.StudentRegister(loginDto);
-            return Ok(result);
+            try
+            {
+                var result = await _authService.StudentRegister(loginDto);
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Success = false, Message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Success = false, Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log the error (e.g., using ILogger)
+                return StatusCode(500, new { Success = false, Message = "An unexpected error occurred" });
+            }
         }
 
         [HttpPost("login")]

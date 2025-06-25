@@ -1,6 +1,9 @@
-﻿using LibraryManagement.API.Data;
+﻿using Konscious.Security.Cryptography;
+using LibraryManagement.API.Data;
 using LibraryManagement.API.DTOs;
 using LibraryManagement.API.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SendGrid;
@@ -10,12 +13,10 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using Konscious.Security.Cryptography;
 using System.Security.Cryptography;
-using Microsoft.AspNetCore.Http.HttpResults;
+using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 
 namespace LibraryManagement.API.Services
@@ -45,52 +46,52 @@ namespace LibraryManagement.API.Services
         }
 
 
-        public async Task<string> StudentRegister(LoginDto loginDto)
+        public async Task<object> StudentRegister(LoginDto loginDto)
         {
-            try
+            // Validate input
+            if (loginDto == null)
+                throw new ArgumentException("Login data is required");
+
+
+
+            if (!await ValidateCaptcha(loginDto.CaptchaToken))
+                throw new InvalidOperationException("Invalid CAPTCHA");
+
+            // Check for existing student
+            var existingStudent = await _context.Students
+                .FirstOrDefaultAsync(s => s.Email == loginDto.Email);
+
+            if (existingStudent != null)
+                throw new InvalidOperationException("Email already registered");
+
+            // Create new student
+            var student = new Student
             {
-                if (loginDto == null)
-                    throw new ArgumentNullException(nameof(loginDto), "Login data is required");
+                Email = loginDto.Email,
+                PasswordHash = HashPassword(loginDto.Password),
+                Name = loginDto.Email.Split('@')[0],
+                IsActive = false,
+                IsVerified = false
+            };
 
-                if (!await ValidateCaptcha(loginDto.CaptchaToken))
-                    throw new InvalidOperationException("Invalid CAPTCHA");
+            _context.Students.Add(student);
+            await _context.SaveChangesAsync();
 
-                var existingStudent = await _context.Students
-                    .FirstOrDefaultAsync(s => s.Email == loginDto.Email);
-
-                if (existingStudent != null)
-                    throw new InvalidOperationException("Student already registered.");
-
-                var student = new Student
-                {
-                    Email = loginDto.Email,
-                    PasswordHash = HashPassword(loginDto.Password),
-                    Name = loginDto.Email.Split('@')[0],
-                    IsActive = false,
-                    IsVerified = false
-                };
-
-                _context.Students.Add(student);
-                await _context.SaveChangesAsync();
-
-                var response = new
-                {
-                    Success = true,
-                    Message = "Registration successful. Awaiting librarian verification."
-                };
-                return JsonSerializer.Serialize(response);
-            }
-            catch (Exception ex)
+            // Return only safe fields
+            return new
             {
-                
-                var response = new
+                Success = true,
+                Message = "Registration successful",
+                Student = new
                 {
-                    Success = false,
-                    Message = $"Registration failed: {ex.Message}"
-                };
-                return JsonSerializer.Serialize(response);
-            }
+                    student.Email,
+                    student.Name,
+                    student.IsActive,
+                    student.IsVerified
+                }
+            };
         }
+
         public async Task SendPasswordResetEmail(string email)
         {
             var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
