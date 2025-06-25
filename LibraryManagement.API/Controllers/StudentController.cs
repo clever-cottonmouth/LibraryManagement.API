@@ -56,6 +56,17 @@ namespace LibraryManagement.API.Controllers
             return Ok(new { Token = token, Email = loginDto.Email });
         }
 
+        [HttpGet("isVerified/{email}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> IsVerified(string email)
+        {
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+            if (student == null) return NotFound("Student not found");
+            return Ok(new { IsVerified = student.IsVerified });
+        }
+
+
+
         [HttpPost("forgot-password")]
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword([FromBody] string email)
