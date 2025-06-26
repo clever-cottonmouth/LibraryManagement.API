@@ -76,6 +76,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
+builder.Services.AddHttpContextAccessor();
+
 
 
 var app = builder.Build();
@@ -95,7 +97,7 @@ app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseStaticFiles();
 app.MapControllers();
 
 app.Run();

@@ -19,10 +19,12 @@ namespace LibraryManagement.API.Services
     public class LibraryService
     {
         private readonly LibraryContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public LibraryService(LibraryContext context)
+        public LibraryService(LibraryContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task AddStudent(StudentDto studentDto)
@@ -222,6 +224,8 @@ namespace LibraryManagement.API.Services
 
         public async Task<List<BookDto>> BooksList()
         {
+            var request = _httpContextAccessor.HttpContext.Request;
+            var baseUrl = $"{request.Scheme}://{request.Host}/";
             return await _context.Books
                 .Select(b => new BookDto
                 {
@@ -230,7 +234,8 @@ namespace LibraryManagement.API.Services
                     Author = b.Author,
                     Publication = b.Publication,
                     Stock = b.Stock,
-                    IsActive = b.IsActive
+                    IsActive = b.IsActive,
+                    PdfUrl = b.PdfUrl != null ? $"{baseUrl}{b.PdfUrl}" : null
                 })
                 .ToListAsync();
         }
