@@ -245,9 +245,9 @@ namespace LibraryManagement.API.Controllers
         }
 
         [HttpGet("notifications")]
-        public async Task<IActionResult> GetNotifications([FromBody] string message)
+        public async Task<IActionResult> GetNotifications()
         {
-            var notifications = await _libraryService.Notifications(message);
+            var notifications = await _libraryService.Notifications();
             return Ok(new
             {
                 Success = true,

@@ -117,7 +117,7 @@ namespace LibraryManagement.API.Controllers
 
         }
 
-        [HttpPost("notifications/reply/{id}")]
+        [HttpPut("notifications/reply/{Id}")]
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> ReplyNotification(int id, [FromBody] string reply)
         {
@@ -125,7 +125,11 @@ namespace LibraryManagement.API.Controllers
             if (notification == null) throw new Exception("Notification not found");
             notification.Reply = reply;
             await _context.SaveChangesAsync();
-            return Ok("Reply sent");
+            return Ok(new
+            {
+                Success=true,
+                Message="Message send Sussessfully"
+            });
         }
 
         [HttpGet("notifications/{email}")]
