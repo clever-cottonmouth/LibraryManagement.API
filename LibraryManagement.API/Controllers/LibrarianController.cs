@@ -126,7 +126,7 @@ namespace LibraryManagement.API.Controllers
         {
             try
             {
-                await _libraryService.IssueBook(issueDto.StudentId, issueDto.BookId);
+                await _libraryService.IssueBook(issueDto);
                 return Ok(new
                 {
                     Success = true,
@@ -156,11 +156,17 @@ namespace LibraryManagement.API.Controllers
         {
             try
             {
-                await _libraryService.ReturnBook(issueId);
+
+                var penalty = await _libraryService.ReturnBook(issueId);
+
+                string message = penalty.HasValue && penalty > 0
+                    ? $"Book returned successfully. Penalty of {penalty} applied."
+                    : "Book returned successfully. No penalty applied.";
                 return Ok(new
                 {
                     Success = true,
-                    Message = "Book returned successfully"
+                    Message = "Book returned successfully",
+                    Penalty = penalty ?? 0
                 });
             }
             catch (ApplicationException ex)

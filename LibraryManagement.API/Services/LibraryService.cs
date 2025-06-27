@@ -100,10 +100,10 @@ namespace LibraryManagement.API.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task IssueBook(int studentId, int bookId)
+        public async Task IssueBook(BookIssueDto issueDto)
         {
-            var student = await _context.Students.FindAsync(studentId);
-            var book = await _context.Books.FindAsync(bookId);
+            var student = await _context.Students.FindAsync(issueDto.StudentId);
+            var book = await _context.Books.FindAsync(issueDto.BookId);
             var settings = await _context.LibrarySettings.FirstOrDefaultAsync();
 
             if (student == null || book == null || settings == null)
@@ -120,10 +120,10 @@ namespace LibraryManagement.API.Services
 
             var issue = new BookIssue
             {
-                StudentId = studentId,
-                BookId = bookId,
-                IssueDate = DateTime.Now,
-                DueDate = DateTime.Now.AddDays(14) // 2 weeks default
+                StudentId = issueDto.StudentId,
+                BookId = issueDto.BookId,
+                IssueDate = issueDto.IssueDate,
+                DueDate = issueDto.DueDate 
             };
 
             book.Stock--;
@@ -132,7 +132,7 @@ namespace LibraryManagement.API.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task ReturnBook(int issueId)
+        public async Task<decimal?> ReturnBook(int issueId)
         {
             var issue = await _context.BookIssues
                 .Include(i => i.Book)
@@ -145,16 +145,20 @@ namespace LibraryManagement.API.Services
             if (settings == null) throw new Exception("Settings not found");
 
             issue.ReturnDate = DateTime.Now;
+            decimal? penalty = null;
+
             if (issue.ReturnDate > issue.DueDate)
             {
                 var daysLate = (issue.ReturnDate.Value - issue.DueDate).Days;
-                issue.Penalty = daysLate * settings.PenaltyPerDay;
-                issue.Student.Penalty += issue.Penalty;
+                penalty = daysLate * settings.PenaltyPerDay;
+                issue.Penalty = penalty.Value;
+                issue.Student.Penalty += penalty.Value;
             }
 
             issue.Book.Stock++;
             issue.Student.BooksIssued--;
             await _context.SaveChangesAsync();
+            return penalty;
         }
 
         public async Task<List<BookDto>> SearchBooks(string query)
