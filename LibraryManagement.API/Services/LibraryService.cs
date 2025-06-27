@@ -182,7 +182,7 @@ namespace LibraryManagement.API.Services
                 .Where(s => s.Name.Contains(query) || s.Email.Contains(query))
                 .Select(s => new StudentDto
                 {
-
+                    Id= s.Id,
                     Email = s.Email,
                     Name = s.Name,
                     IsActive = s.IsActive,
@@ -227,6 +227,7 @@ namespace LibraryManagement.API.Services
             var request = _httpContextAccessor.HttpContext.Request;
             var baseUrl = $"{request.Scheme}://{request.Host}/";
             return await _context.Books
+                .OrderByDescending(b => b.Id)
                 .Select(b => new BookDto
                 {
                     Id = b.Id,

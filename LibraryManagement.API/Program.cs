@@ -68,7 +68,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<LibraryService>();
-builder.Services.AddScoped<FileService>();
 builder.Services.AddSingleton<ISendGridClient>(new SendGridClient(builder.Configuration["SendGrid:ApiKey"]));
 
 builder.Services.AddCors(options =>

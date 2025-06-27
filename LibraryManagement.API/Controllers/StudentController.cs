@@ -62,7 +62,7 @@ namespace LibraryManagement.API.Controllers
         {
             var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
             if (student == null) return NotFound("Student not found");
-            return Ok(new { IsVerified = student.IsVerified });
+            return Ok(new { IsVerified = student.IsVerified, IsActive = student.IsActive });
         }
 
 

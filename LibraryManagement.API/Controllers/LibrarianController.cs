@@ -239,7 +239,6 @@ namespace LibraryManagement.API.Controllers
             return Ok(new
             {
                 Success = true,
-                // Data includes PdfFile property, which is the path to the PDF file for each book
                 Data = books
             });
         }

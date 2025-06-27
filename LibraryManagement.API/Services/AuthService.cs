@@ -70,7 +70,7 @@ namespace LibraryManagement.API.Services
                 Email = loginDto.Email,
                 PasswordHash = HashPassword(loginDto.Password),
                 Name = loginDto.Email.Split('@')[0],
-                IsActive = false,
+                IsActive = true,
                 IsVerified = false
             };
 
