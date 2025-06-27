@@ -91,30 +91,24 @@ namespace LibraryManagement.API.Controllers
             return Ok(books);
         }
 
-        //[HttpGet("issued-books")]
-        //[Authorize(Roles = "Student")]
-        //public async Task<IActionResult> GetIssuedBooks()
-        //{
-        //    var studentId = int.Parse(User.FindFirst(JwtRegisteredClaimNames.Jti).Value);
-        //    var issues = await _context.BookIssues
-        //        .Include(i => i.Book)
-        //        .Where(i => i.StudentId == studentId && i.ReturnDate == null)
-        //        .ToListAsync();
-        //    return Ok(issues);
-        //}
 
         [HttpGet("issued-books/{email}")]
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetIssuedBooks(string email)
         {
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
-            if (student == null) throw new Exception("Student not found");
-            var issues = await _context.BookIssues
-                .Include(i => i.Book)
-                .Where(i => i.StudentId == student.Id && i.ReturnDate == null)
-                .ToListAsync();
-            return Ok(issues);
-
+            try
+            {
+                var data = await _libraryService.GetIssuedBooks(email);
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Student not found")
+                    return NotFound(ex.Message);
+                if (ex.Message == "Library settings not configured")
+                    return StatusCode(500, ex.Message);
+                return StatusCode(500, "An unexpected error occurred");
+            }
         }
 
         [HttpPut("notifications/reply/{Id}")]

@@ -11,6 +11,7 @@ namespace LibraryManagement.API.DTOs
         public int Id { get; set; }
         public int StudentId { get; set; }
         public int BookId { get; set; }
+        public string? BookTitle { get; set; }
         public DateTime IssueDate { get; set; }
         public DateTime DueDate { get; set; }
         public decimal Penalty { get; set; }

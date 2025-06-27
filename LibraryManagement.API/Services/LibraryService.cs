@@ -245,6 +245,43 @@ namespace LibraryManagement.API.Services
                 .ToListAsync();
         }
 
+
+        public async Task<List<BookIssueDto>> GetIssuedBooks(string email)
+        {
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+            if (student == null)
+            {
+                throw new Exception("Student not found");
+            }
+
+            var librarySettings = await _context.LibrarySettings.FirstOrDefaultAsync();
+            if (librarySettings == null)
+            {
+                throw new Exception("Library settings not configured");
+            }
+            decimal penaltyPerDay = librarySettings.PenaltyPerDay;
+
+            var currentDate = DateTime.Today;
+
+            var issues = await _context.BookIssues
+                .Include(i => i.Book)
+                .Where(i => i.StudentId == student.Id && i.ReturnDate == null)
+                .Select(i => new BookIssueDto
+                {
+                    Id = i.Id,
+                    BookId = i.BookId,
+                    BookTitle = i.Book.Title, 
+                    IssueDate = i.IssueDate,
+                    DueDate = i.DueDate,
+                    Penalty = i.DueDate.Date < currentDate
+                        ? (decimal)(currentDate - i.DueDate.Date).TotalDays * penaltyPerDay
+                        : 0m
+                })
+                .ToListAsync();
+
+            return issues;
+        }
+
         public async Task<List<Notification>> Notifications()
         {
             return await _context.Notifications
