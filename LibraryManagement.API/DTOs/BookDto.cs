@@ -15,6 +15,7 @@ namespace LibraryManagement.API.DTOs
         public int Stock { get; set; }
         public bool IsActive { get; set; }
         public string PdfUrl { get; set; }
+        public string VideoUrl { get; set; }
 
     }
 }

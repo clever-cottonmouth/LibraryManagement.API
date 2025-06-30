@@ -71,7 +71,7 @@ namespace LibraryManagement.API.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddBook(BookDto bookDto, IFormFile pdfFile)
+        public async Task AddBook(BookDto bookDto, IFormFile pdfFile, IFormFile videoFile)
         {
             var book = new Book
             {
@@ -94,6 +94,20 @@ namespace LibraryManagement.API.Services
                     await pdfFile.CopyToAsync(stream);
                 }
                 book.PdfUrl = Path.Combine("uploads", fileName).Replace("\\", "/");
+            }
+
+            if (videoFile != null && videoFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine("wwwroot", "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(videoFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await videoFile.CopyToAsync(stream);
+                }
+                book.VideoUrl = Path.Combine("uploads", fileName).Replace("\\", "/");
             }
 
             _context.Books.Add(book);
@@ -240,7 +254,8 @@ namespace LibraryManagement.API.Services
                     Publication = b.Publication,
                     Stock = b.Stock,
                     IsActive = b.IsActive,
-                    PdfUrl = b.PdfUrl != null ? $"{baseUrl}{b.PdfUrl}" : null
+                    PdfUrl = b.PdfUrl != null ? $"{baseUrl}{b.PdfUrl}" : null,
+                    VideoUrl = b.VideoUrl != null ? $"{baseUrl}{b.VideoUrl}" : null
                 })
                 .ToListAsync();
         }
@@ -373,12 +388,13 @@ namespace LibraryManagement.API.Services
                 Publication = book.Publication,
                 Stock = book.Stock,
                 IsActive = book.IsActive,
-                PdfUrl = book.PdfUrl
+                PdfUrl = book.PdfUrl,
+                VideoUrl = book.VideoUrl
             };
         }
 
 
-        public async Task UpdateBook(int id, BookDto bookDto, IFormFile pdfFile)
+        public async Task UpdateBook(int id, BookDto bookDto, IFormFile pdfFile, IFormFile videoFile)
         {
             var book = await _context.Books.FindAsync(id);
             if (book == null)
@@ -420,6 +436,35 @@ namespace LibraryManagement.API.Services
                     await pdfFile.CopyToAsync(stream);
                 }
                 book.PdfUrl = Path.Combine("uploads", fileName).Replace("\\", "/");
+            }
+
+
+            if (videoFile != null && videoFile.Length > 0)
+            {
+                // Delete old PDF if it exists
+                if (!string.IsNullOrEmpty(book.VideoUrl))
+                {
+                    var oldFilePath = Path.Combine("wwwroot", book.VideoUrl.Replace("/", "\\"));
+                    if (File.Exists(oldFilePath))
+                    {
+                        File.Delete(oldFilePath);
+                    }
+                }
+
+                // Save new PDF
+                var uploadsFolder = Path.Combine("wwwroot", "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(videoFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await videoFile.CopyToAsync(stream);
+                }
+                book.VideoUrl = Path.Combine("uploads", fileName).Replace("\\", "/");
             }
 
             _context.Books.Update(book);

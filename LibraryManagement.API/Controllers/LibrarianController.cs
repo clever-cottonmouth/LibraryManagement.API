@@ -112,7 +112,7 @@ namespace LibraryManagement.API.Controllers
                 Publication = form.Publication,
                 Stock = form.Stock
             };
-            await _libraryService.AddBook(bookDto, form.PdfFile);
+            await _libraryService.AddBook(bookDto, form.PdfFile, form.VideoFile);
             return Ok(new
             {
                 Success = true,
@@ -429,7 +429,7 @@ namespace LibraryManagement.API.Controllers
                     Stock = form.Stock,
                     IsActive = true
                 };
-                await _libraryService.UpdateBook(id, bookDto, form.PdfFile);
+                await _libraryService.UpdateBook(id, bookDto, form.PdfFile, form.VideoFile);
                 return Ok(new
                 {
                     Success = true,
