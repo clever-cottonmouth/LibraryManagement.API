@@ -2,21 +2,15 @@
 using LibraryManagement.API.Data;
 using LibraryManagement.API.DTOs;
 using LibraryManagement.API.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System;
-using System.Collections.Generic;
+using System.Net.Mail;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 
 namespace LibraryManagement.API.Services
@@ -25,13 +19,11 @@ namespace LibraryManagement.API.Services
     {
         private readonly LibraryContext _context;
         private readonly IConfiguration _configuration;
-        private readonly ISendGridClient _sendGridClient;
 
-        public AuthService(LibraryContext context, IConfiguration configuration, ISendGridClient sendGridClient)
+        public AuthService(LibraryContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
-            _sendGridClient = sendGridClient;
         }
 
         public async Task<string> LibrarianLogin(LoginDto loginDto)
@@ -94,20 +86,48 @@ namespace LibraryManagement.API.Services
 
         public async Task SendPasswordResetEmail(string email)
         {
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
-            if (student == null) throw new Exception("Student not found");
-
-            var token = GenerateJwtToken(email, "Student", TimeSpan.FromMinutes(30));
-            var resetLink = $"https://yourapp.com/reset-password?token={token}";
-
-            var message = new SendGridMessage
+            try
             {
-                From = new EmailAddress("no-reply@library.com"),
-                Subject = "Password Reset",
-                PlainTextContent = $"Click here to reset your password: {resetLink}"
-            };
-            message.AddTo(new EmailAddress(email));
-            await _sendGridClient.SendEmailAsync(message);
+                // Find the student by email
+                var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+                if (student == null) throw new Exception("Student not found");
+
+                // Generate JWT token for password reset
+                var token = GenerateJwtToken(email, "Student", TimeSpan.FromMinutes(30));
+                var resetLink = $"http://localhost:4200/reset-password?token={token}";
+
+                // Get SendGrid settings from configuration
+                var apiKey = _configuration["SendGrid:ApiKey"];
+                var fromEmail = _configuration["SendGrid:FromEmail"];
+                var fromName = _configuration["SendGrid:FromName"];
+
+                // Initialize SendGrid client
+                var sendGridClient = new SendGridClient(apiKey);
+
+                // Create the email message
+                var message = new SendGridMessage
+                {
+                    From = new EmailAddress(fromEmail, fromName),
+                    Subject = "Password Reset",
+                    PlainTextContent = $"Click here to reset your password: {resetLink}"
+                    // Optionally, add HTML content: HtmlContent = $"<p>Click <a href='{resetLink}'>here</a> to reset your password.</p>"
+                };
+                message.AddTo(new EmailAddress(email));
+
+                // Send the email
+                var response = await sendGridClient.SendEmailAsync(message);
+
+                // Check response status (optional, for debugging)
+                if (response.StatusCode != System.Net.HttpStatusCode.Accepted &&
+                    response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    throw new Exception("Failed to send email.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error sending password reset email.", ex);
+            }
         }
 
         private string GenerateJwtToken(string email, string role, TimeSpan? expiry = null)

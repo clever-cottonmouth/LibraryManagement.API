@@ -1,6 +1,7 @@
 ﻿using LibraryManagement.API.Data;
 using LibraryManagement.API.DTOs;
 using LibraryManagement.API.Services;
+using LibraryManagement.API.utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -71,8 +72,24 @@ namespace LibraryManagement.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword([FromBody] string email)
         {
-            await _authService.SendPasswordResetEmail(email);
-            return Ok("Password reset email sent");
+            try
+            {
+                await _authService.SendPasswordResetEmail(email);
+                return Ok(new ApiResponse
+                {
+                    Message = "Password reset email sent",
+                    Status = "Success"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Message = "Failed to send password reset email",
+                    Status = "Error",
+                    Error = ex.Message
+                });
+            }
         }
 
         [HttpGet("books/search")]
