@@ -123,6 +123,9 @@ namespace LibraryManagement.API.Services
             if (student == null || book == null || settings == null)
                 throw new ApplicationException("Invalid student, book, or settings");
 
+            if (issueDto.DueDate <= issueDto.IssueDate)
+                throw new ApplicationException("Due date must be after issue date");
+
             if (!student.IsActive || !student.IsVerified)
                 throw new ApplicationException("Student account not active or verified");
 
