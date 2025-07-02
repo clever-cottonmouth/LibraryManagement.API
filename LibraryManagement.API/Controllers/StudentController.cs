@@ -138,8 +138,8 @@ namespace LibraryManagement.API.Controllers
             await _context.SaveChangesAsync();
             return Ok(new
             {
-                Success=true,
-                Message="Message send Sussessfully"
+                Success = true,
+                Message = "Message send Sussessfully"
             });
         }
 
@@ -216,6 +216,22 @@ namespace LibraryManagement.API.Controllers
                 Message = "Password updated successfully",
                 Success = true,
                 Student = result
+            });
+        }
+
+        [HttpGet("getInfo/{email}")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> GetStudentInfo(string email)
+        {
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+            if (student == null) return NotFound("Student not found");
+            return Ok(new StudentDto
+            {
+                Id = student.Id,
+                Email = student.Email,
+                Name = student.Name,
+                IsActive = student.IsActive,
+                IsVerified = student.IsVerified
             });
         }
     }
