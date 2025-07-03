@@ -73,6 +73,29 @@ namespace LibraryManagement.API.Services
 
         public async Task AddBook(BookDto bookDto, IFormFile pdfFile, IFormFile videoFile)
         {
+            var bookExists = await _context.Books
+            .AsNoTracking()
+            .AnyAsync(b => b.Title == bookDto.Title &&
+                          b.Author == bookDto.Author &&
+                          b.Publication == bookDto.Publication);
+            if (bookExists)
+            {
+                throw new InvalidOperationException("A book with the same title, author, and publication already exists");
+            }
+
+            const long maxPdfSizeBytes = 5 * 1024 * 1024; 
+            const long maxVideoSizeBytes = 50 * 1024 * 1024; 
+
+            if (pdfFile != null && pdfFile.Length > maxPdfSizeBytes)
+            {
+                throw new ArgumentException("PDF file size exceeds 5 MB");
+            }
+
+            if (videoFile != null && videoFile.Length > maxVideoSizeBytes)
+            {
+                throw new ArgumentException("Video file size exceeds 50 MB");
+            }
+
             var book = new Book
             {
                 Title = bookDto.Title,

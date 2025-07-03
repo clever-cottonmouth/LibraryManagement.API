@@ -53,8 +53,20 @@ namespace LibraryManagement.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var token = await _authService.StudentLogin(loginDto);
-            return Ok(new { Token = token, Email = loginDto.Email });
+            try
+            {
+                var token = await _authService.StudentLogin(loginDto);
+                if (token == null)
+                {
+                    return Unauthorized(new { Message = "Invalid email or password" });
+                }
+
+                return Ok(new { Token = token, Email = loginDto.Email });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred during login" });
+            }
         }
 
         [HttpGet("isVerified/{email}")]
@@ -94,7 +106,7 @@ namespace LibraryManagement.API.Controllers
 
         [HttpGet("books/search")]
         [Authorize(Roles = "Student")]
-        public async Task<IActionResult> SearchBooks([FromQuery] string query)
+        public async Task<IActionResult> SearchBooks([FromQuery] string query="")
         {
             var books = await _libraryService.SearchBooks(query);
             return Ok(books);
@@ -160,63 +172,82 @@ namespace LibraryManagement.API.Controllers
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> ProfileUpdate(string email, [FromBody] StudentDto student)
         {
-            var existingStudent = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
-            if (existingStudent == null) throw new Exception("Student not found");
-            existingStudent.Name = student.Name;
-
-            _context.Students.Update(existingStudent);
-            await _context.SaveChangesAsync();
-            return Ok(new
+            try
             {
-                Email = email,
-                Name = existingStudent.Name,
-            });
+                var existingStudent = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+                if (existingStudent == null) throw new Exception("Student not found");
+                existingStudent.Name = student.Name;
+
+                _context.Students.Update(existingStudent);
+                await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    Email = email,
+                    Name = existingStudent.Name,
+                });
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+
+            
         }
 
         [HttpPut("change-password/{email}")]
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> ChangePassword(string email, [FromBody] UpdatePasswordDto form)
         {
-            if (form == null)
+            try
             {
-                return BadRequest(new { Error = "Invalid request data." });
-            }
-            if (string.IsNullOrWhiteSpace(form.OldPassword) || string.IsNullOrWhiteSpace(form.NewPassword) || string.IsNullOrWhiteSpace(form.ConfirmPassword))
-            {
-                return BadRequest(new { Error = "All password fields are required." });
-            }
-            if (form.NewPassword.Length < 6)
-            {
-                return BadRequest(new { Error = "New password must be at least 6 characters long." });
-            }
-            var result = await _authService.ChangePassword(email, form);
-            if (result == null)
-            {
-                // Determine the specific error
-                var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
-                if (student == null)
+                if (form == null)
                 {
-                    return NotFound(new { Error = "Student not found." });
+                    throw new Exception("Form data is required.");
                 }
-                else if (form.NewPassword != form.ConfirmPassword)
+                if (string.IsNullOrWhiteSpace(form.OldPassword) || string.IsNullOrWhiteSpace(form.NewPassword) || string.IsNullOrWhiteSpace(form.ConfirmPassword))
                 {
-                    return BadRequest(new { Error = "New password and confirmation do not match." });
+                    throw new Exception("All password fields are required.");
                 }
-                else if (!_authService.VerifyPassword(form.OldPassword, student.PasswordHash))
+                if (form.NewPassword.Length < 6)
                 {
-                    return BadRequest(new { Error = "Old password is incorrect." });
+                    throw new Exception("New password must be at least 6 characters long.");
                 }
-                else
+                var result = await _authService.ChangePassword(email, form);
+                if (result == null)
                 {
-                    return BadRequest(new { Error = "Failed to update password. Please try again." });
+                    var student = await _context.Students.FirstOrDefaultAsync(s => s.Email == email);
+                    if (student == null)
+                    {
+                        throw new Exception("Student not found.");
+                    }
+                    else if (form.NewPassword != form.ConfirmPassword)
+                    {
+                        throw new Exception("New password and confirm password do not match.");
+                    }
+                    else if (!_authService.VerifyPassword(form.OldPassword, student.PasswordHash))
+                    {
+                        throw new Exception("Old password is incorrect.");
+                    }
+                    else
+                    {
+                        throw new Exception("An error occurred while changing the password.");
+                    }
                 }
+                return Ok(new
+                {
+                    Message = "Password updated successfully",
+                    Success = true,
+                    Student = result
+                });
             }
-            return Ok(new
+            catch (Exception ex)
             {
-                Message = "Password updated successfully",
-                Success = true,
-                Student = result
-            });
+                return Unauthorized (new
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
+            }           
         }
 
         [HttpGet("getInfo/{email}")]

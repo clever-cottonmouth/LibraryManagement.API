@@ -30,8 +30,23 @@ namespace LibraryManagement.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var token = await _authService.LibrarianLogin(loginDto);
-            return Ok(new { Token = token });
+
+            try
+            {
+                var token = await _authService.LibrarianLogin(loginDto);
+
+                if (token == null)
+                {
+                    return Unauthorized(new { Message = "Invalid email or password" });
+                }
+                return Ok(new { Token = token });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred during login" });
+            }
+
+           
         }
 
         [HttpPost("students")]
@@ -105,20 +120,31 @@ namespace LibraryManagement.API.Controllers
         [HttpPost("books")]
         public async Task<IActionResult> AddBook([FromForm] AddBookFormDto form)
         {
-            var bookDto = new BookDto
+            try
             {
-                Title = form.Title,
-                Author = form.Author,
-                Publication = form.Publication,
-                Stock = form.Stock
-            };
-            await _libraryService.AddBook(bookDto, form.PdfFile, form.VideoFile);
-            return Ok(new
+                var bookDto = new BookDto
+                {
+                    Title = form.Title,
+                    Author = form.Author,
+                    Publication = form.Publication,
+                    Stock = form.Stock
+                };
+                await _libraryService.AddBook(bookDto, form.PdfFile, form.VideoFile);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Book added successfully",
+                    Data = bookDto
+                });
+            }
+            catch(Exception ex)
             {
-                Success = true,
-                Message = "Book added successfully",
-                Data = bookDto
-            });
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = $"Failed to add book: {ex.Message}"
+                });
+            }
         }
 
         [HttpPost("issue")]
