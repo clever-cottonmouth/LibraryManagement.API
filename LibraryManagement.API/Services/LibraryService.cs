@@ -334,10 +334,21 @@ namespace LibraryManagement.API.Services
         public async Task<IActionResult> DeleteStudent(int id)
         {
             var student = await _context.Students.FindAsync(id);
-            if (student == null) return new NotFoundResult();
+            if (student == null)
+                return null;
+
+            var issuedBook = await _context.BookIssues
+                .FirstOrDefaultAsync(i => i.StudentId == id && i.ReturnDate == null);
+            if (issuedBook != null)
+                throw new InvalidOperationException("Cannot delete student with unreturned books.");
+
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
-            return new OkResult();
+            return new OkObjectResult(new
+            {
+                Success = true,
+                Message = "Student deleted successfully"
+            });
         }
 
         public async Task<StudentDto> StudentById(int id)
